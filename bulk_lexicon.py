@@ -35,7 +35,7 @@ def parse_table(text):
         for item in re.finditer(r'(?:^|,)\s*("(?:[^"\\]|\\.)*"|[^,:\s]+)\s*:\s*\d+\s*(?=,|$)', body):
             code = item[1]
             code = json.loads(code) if code.startswith('"') else code
-            if re.fullmatch(r"[A-Z]{2,4}", code):
+            if re.fullmatch(r"[A-Z]{1,4}", code):
                 codes.append(code)
         result[character] = list(dict.fromkeys(codes))
     if not result:
@@ -155,7 +155,7 @@ def fetch_full_rows(cache, all_senses=False, refresh=False):
     rows, entries, failures = [], [], []
     for character, codes in inventory.items():
         if not codes:
-            failures.append(dict(character=character, error="No eligible 2–4-letter code"))
+            failures.append(dict(character=character, error="No eligible 1–4-letter code"))
             continue
         glosses = cedict.get(character)
         source = CEDICT

@@ -18,8 +18,8 @@ class LookupTests(unittest.TestCase):
         html += ''.join(f'<span class="font-mono tracking-widest">{c}</span>'
                         for c in ('CFA', 'COFU', 'COX', 'CFA', 'A', 'CFA1'))
         html += '<code>ZZ</code>'
-        self.assertEqual(parse_codes(html, '蝦'), 'CFA COFU COX')
-        self.assertEqual(shortest_code(parse_codes(html, '蝦')), 'cfa')
+        self.assertEqual(parse_codes(html, '蝦'), 'CFA COFU COX A')
+        self.assertEqual(shortest_code(parse_codes(html, '蝦')), 'a')
         with self.assertRaises(ValueError):
             parse_codes(html, '米')
 
@@ -86,20 +86,39 @@ class LookupTests(unittest.TestCase):
         finally:
             pos_classifier.WORDNET = previous
 
-    def test_same_root_separate_meanings_and_capacity(self):
-        rows = [dict(character='米', meaning=str(i), pos='noun', codes='MN') for i in range(4)]
+    def test_four_consonant_root_extends_only_after_all_regular_forms(self):
+        rows = [dict(character='米', meaning=str(i), pos='noun', codes='ABCD') for i in range(36)]
         result = generate(rows)
-        self.assertEqual(len({r['orthography'] for r in result}), 4)
-        rows.append(dict(character='米', meaning='overflow', pos='noun', codes='MN'))
-        with self.assertRaisesRegex(ValueError, 'exhausted'):
-            generate(rows)
+        self.assertEqual(len({r['orthography'] for r in result}), 36)
+        rows.append(dict(character='米', meaning='overflow', pos='noun', codes='ABCD'))
         rejected = []
-        self.assertEqual(len(generate(rows, rejected=rejected)), 4)
-        self.assertEqual(rejected[0]['meaning'], 'overflow')
+        extensions = []
+        extended_result = generate(rows, rejected=rejected, extensions=extensions)
+        self.assertEqual(extended_result[:36], result)
+        self.assertEqual(len(extended_result), 37)
+        self.assertEqual(len({r['orthography'] for r in extended_result}), 37)
+        self.assertEqual(rejected, [])
+        self.assertEqual(len(extensions), 1)
+        self.assertEqual(extensions[0]['meaning'], 'overflow')
+        self.assertEqual(len(extensions[0]['extended_code']), 5)
+        self.assertTrue(all('[added:' not in r['source'] for r in extended_result[:36]))
+
+    def test_two_and_three_consonant_roots_keep_regular_forms(self):
+        for code, capacity in [('BC', 4), ('BCD', 12)]:
+            with self.subTest(code=code):
+                rows = [dict(character='米', meaning=str(i), pos='verb', codes=code) for i in range(capacity + 3)]
+                regular = generate(rows[:capacity], seed=3)
+                extensions = []
+                result = generate(rows, seed=3, extensions=extensions)
+                self.assertEqual(result[:capacity], regular)
+                self.assertEqual(len(result), capacity + 3)
+                self.assertEqual(len({r['orthography'] for r in result}), len(result))
+                self.assertEqual(len(extensions), 3)
+                self.assertTrue(all(e['extended_code'].startswith(code) and len(e['extended_code']) == len(code) + 1 for e in extensions))
 
     def test_bulk_tables_are_parsed_as_data(self):
         table = 'const X={蝦:{CFA:3,COFU:0,C:1,CFA1:4},"𠀀":{ABCD:8},"，":{ZZ:2}};export{X as default};'
-        self.assertEqual(parse_table(table), {'蝦': ['CFA', 'COFU'], '𠀀': ['ABCD']})
+        self.assertEqual(parse_table(table), {'蝦': ['CFA', 'COFU', 'C'], '𠀀': ['ABCD']})
         with self.assertRaises(ValueError):
             parse_table('throw new Error("never execute downloaded code")')
 
@@ -136,6 +155,26 @@ class LookupTests(unittest.TestCase):
         retained, excluded = taiwan_filter(dict.fromkeys('蝦虾後后乾干山', ['AB']), data, buffer.getvalue())
         self.assertEqual(set(retained), set('蝦後后乾干山'))
         self.assertEqual([row['character'] for row in excluded], ['虾'])
+
+    def test_single_letter_roots_extend_only_on_collision(self):
+        from generate_dictionary import candidates
+        self.assertEqual(list(candidates('b', 'noun')), [('bi', 'bi')])
+        self.assertEqual(shortest_code('BA B BCD'), 'b')
+        rows = [dict(character='米', meaning=str(i), pos='noun', codes='B') for i in range(130)]
+        # Existing longer roots share the same global spelling namespace.
+        rows.insert(0, dict(character='山', meaning='mountain', pos='noun', codes='BA'))
+        extensions = []
+        result = generate(rows, seed=42, extensions=extensions)
+        self.assertEqual(len(result), 131)
+        self.assertEqual(len({r['orthography'] for r in result}), 131)
+        self.assertEqual(result[1]['orthography'], 'bi')
+        self.assertNotIn('[added:', result[1]['source'])
+        self.assertEqual(len(extensions), 129)
+        self.assertTrue(any(len(e['extended_code']) == 3 for e in extensions))
+        self.assertEqual(result, generate(rows, seed=42))
+        for row in result:
+            self.assertRegex(row['orthography'], r'^(?:[^aiu][aiu])+[^aiu]?$')
+            self.assertEqual(next(c for c in row['orthography'] if c in 'aiu'), 'i')
 
 
 if __name__ == '__main__':

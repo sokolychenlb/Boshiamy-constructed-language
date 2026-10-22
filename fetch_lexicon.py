@@ -90,9 +90,9 @@ def parse_codes(text, character):
         raise ValueError(f"Unexpected code lookup results for {character!r}; website format may have changed")
     spans = Elements("span", lambda a: {"font-mono", "tracking-widest"}.issubset(a.get("class", "").split()))
     spans.feed(text)
-    codes = list(dict.fromkeys(s.strip() for s in spans.items if re.fullmatch(r"[A-Z]{2,4}", s.strip())))
+    codes = list(dict.fromkeys(s.strip() for s in spans.items if re.fullmatch(r"[A-Z]{1,4}", s.strip())))
     if not codes:
-        raise ValueError(f"No eligible 2–4-letter codes for {character!r}")
+        raise ValueError(f"No eligible 1–4-letter codes for {character!r}")
     return " ".join(codes)
 
 

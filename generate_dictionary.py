@@ -18,21 +18,18 @@ VOWELS = "aiu"
 def shortest_code(raw: str) -> str:
     """Codes separated by whitespace, commas, pipes, or semicolons; ties keep order.
 
-    One-letter shortcuts are ineligible. Selection digits and punctuation are
+    One-letter shortcuts are eligible. Selection digits and punctuation are
     rejected rather than silently interpreted as consonants.
     """
     codes = re.split(r"[\s,;|]+", raw.strip().lower())
     if not codes or any(not re.fullmatch(r"[a-z]{1,4}", c) for c in codes):
         raise ValueError(f"Invalid code list: {raw!r}; use 1–4 ASCII letters per code")
-    eligible = [c for c in codes if 2 <= len(c) <= 4]
-    if not eligible:
-        raise ValueError(f"No eligible 2–4-letter code in {raw!r}")
-    return min(eligible, key=len)
+    return min(codes, key=len)
 
 
 def candidates(code: str, pos: str):
     """Enumerate CV…CVC and CV…CV, each with the required first vowel."""
-    for final_coda in (True, False):
+    for final_coda in ((False,) if len(code) == 1 else (True, False)):
         vowel_count = len(code) - int(final_coda)
         for rest in itertools.product(VOWELS, repeat=vowel_count - 1):
             vowels = (FIRST_VOWEL[pos],) + rest
@@ -46,7 +43,27 @@ def candidates(code: str, pos: str):
             yield "".join(orth), "".join(ipa)
 
 
-def generate(rows, seed=0, rejected=None):
+def choose_spelling(code, pos, used, rng):
+    """Try vowel variation first; only extend the root after all forms collide."""
+    for extra_count in itertools.count():
+        # Shuffle each position, then enumerate lazily: no fixed extension limit
+        # and no exponentially large list of consonant suffixes in memory.
+        alphabets = []
+        for _ in range(extra_count):
+            alphabet = list(ORTHOGRAPHY)
+            rng.shuffle(alphabet)
+            alphabets.append(alphabet)
+        suffixes = itertools.product(*alphabets)
+        for suffix in suffixes:
+            extended = code + "".join(suffix)
+            options = list(candidates(extended, pos))
+            rng.shuffle(options)
+            selected = next((pair for pair in options if pair[0] not in used), None)
+            if selected is not None:
+                return selected, extended
+
+
+def generate(rows, seed=0, rejected=None, extensions=None):
     rng = random.Random(seed)
     used = set()
     seen = set()
@@ -65,22 +82,16 @@ def generate(rows, seed=0, rejected=None):
             if identity in seen:
                 continue
             seen.add(identity)
-            options = list(candidates(code, pos))
-            rng.shuffle(options)
-            selected = next((pair for pair in options if pair[0] not in used), None)
-            if selected is None:
-                if rejected is not None:
-                    rejected.append(dict(character=character, meaning=meaning, pos=pos,
-                                         error=f"Root {code.upper()} ({pos}) exhausted its {len(options)} spellings"))
-                    continue
-                raise ValueError(
-                    f"Root {code.upper()} ({pos}) has exhausted its "
-                    f"{len(options)} spellings; revise the lexicon or language rules"
-                )
+            selected, extended = choose_spelling(code, pos, used, rng)
             orth, ipa = selected
             used.add(orth)
+            added = "".join(ORTHOGRAPHY[c] for c in extended[len(code):])
+            if added and extensions is not None:
+                extensions.append(dict(character=character, meaning=meaning, pos=pos,
+                                       original_code=code.upper(), extended_code=extended.upper(),
+                                       added_consonants=added, orthography=orth))
             result.append({"orthography": orth, "ipa": ipa, "meaning": meaning,
-                           "source": f"{character} ({code.upper()})"})
+                           "source": f"{character} ({code.upper()})" + (f" [added: {added}]" if added else "")})
         except (KeyError, AttributeError, ValueError) as exc:
             raise ValueError(f"Input row {line}: {exc}") from exc
     return result
@@ -145,8 +156,10 @@ def main():
                 writer.writeheader()
                 writer.writerows(rows)
             rejected = [] if full else None
-            dictionary = generate(rows, args.seed, rejected=rejected)
+            extensions = []
+            dictionary = generate(rows, args.seed, rejected=rejected, extensions=extensions)
             audit["generation_failures"] = rejected or []
+            audit["root_extensions"] = extensions
             audit["pos_summary"] = dict(Counter(entry["detailed_pos"] for entry in audit["entries"]))
             audit["pos_review_entries"] = sum(entry["pos_review_required"] for entry in audit["entries"])
             audit["pos_unresolved_entries"] = sum(entry["detailed_pos"] == "unknown" for entry in audit["entries"])
@@ -156,8 +169,7 @@ def main():
             sidecars[1].write_text(json.dumps(audit, ensure_ascii=False, indent=2), encoding="utf-8")
             print(f"Saved fetched inputs and attribution to {sidecars[0]} and {sidecars[1]}")
             if audit["failures"] or rejected:
-                print(f"PARTIAL RESULT: {len(audit['failures']):,} character(s) lack codes/meanings; "
-                      f"{len(rejected or []):,} sense(s) exceeded root capacity. See source report.")
+                print(f"PARTIAL RESULT: {len(audit['failures']):,} character(s) lack codes/meanings. See source report.")
         else:
             with args.input.open(encoding="utf-8-sig", newline="") as stream:
                 reader = csv.DictReader(stream)

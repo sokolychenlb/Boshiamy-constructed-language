@@ -32,11 +32,10 @@ usable sense per character. `--auto` without a character list is also full mode.
 No character list or input CSV is required.
 
 Characters without meanings or eligible codes are recorded in the source report.
-Full mode also records senses that exceed a root's spelling capacity and
-continues generating the rest. Thus **full discovery does not guarantee a word
+Thus **full discovery does not guarantee a word
 for every character**: the available meanings and finite vowel patterns impose
 limits. The report's `complete` flag is false whenever entries are omitted.
-There is no fallback to longer codes and no placeholder meaning.
+Collisions can append random consonants as described below; no placeholder meanings are used.
 
 For a specific list, the previous per-character Kaikki/Wiktionary lookup remains:
 
@@ -59,8 +58,8 @@ Automatic mode also saves `dictionary.lexicon.csv` (reusable fetched inputs) and
 The dictionary itself still has exactly the four requested columns.
 
 Source order does not guarantee the most frequent sense comes first.
-Selected-character and manual modes stop on spelling exhaustion; full mode
-records the omitted sense and continues. The fetched inputs remain available for editing.
+Spelling collisions are resolved by extending only the unmatched senses' roots.
+The fetched inputs remain available for editing.
 Definitions can include regional or historical senses and classifier notes.
 
 The shared classifier in `pos_classifier.py` works per sense, so different senses
@@ -127,8 +126,8 @@ across that complete set. Selected-character mode uses all eligible codes displa
 on the character's lookup page, in display order. Full mode uses the table union
 described above.
 
-The shortest supplied code of 2–4 letters wins; equal-length ties preserve input
-order. One-letter shortcuts are ignored. Digits and nonletter codes are rejected;
+The shortest supplied code of 1–4 letters wins; equal-length ties preserve input
+order. One-letter shortcuts are included. Digits and nonletter codes are rejected;
 selection numbers must not be included in codes.
 
 Each code letter becomes one consonant using the requested mapping. Every
@@ -142,7 +141,21 @@ For CFA as a noun, `šifaǧ` / `ʃifaɣ` is one possible result; other seeds may
 choose another valid form. IPA is broad and has no added stress marks or slashes.
 
 Uniqueness is global, even when meanings match. Exact duplicate input entries
-are skipped. There are 4, 12, or 36 forms per part of speech for roots of 2, 3,
-or 4 consonants respectively. If all are used, manual/selected mode fails before
-writing the output; full mode logs the omitted entry. It never lengthens a root
-or violates the syllable rules.
+are skipped. A one-consonant root initially produces CV, with one form per part
+of speech. Two-, three-, and four-consonant roots have 4, 12, and 36 vowel forms
+per part of speech. All vowel forms of the original root are tried first.
+If they are taken, a random mapped consonant is appended to the root and valid
+vowel forms are tried again. This applies to all original code lengths, including
+four-letter codes. Further consonants can be appended if needed, with no fixed
+extension limit. All choices are checked against the same global spelling set,
+including words whose original codes are longer. The syllable rules still apply:
+e.g. `bi` may extend to `bik` or `bika`, but never to a final consonant cluster.
+
+The four-column output retains the original character and code in `source`,
+adding `[added: …]` when synthetic consonants were needed. These consonants are
+not claimed to be part of the input-method code. Automatic-mode source reports
+also record the full details in `root_extensions`. A fixed seed reproduces random
+choices for the same input order. Original codes remain 1–4 letters; synthetic
+extensions can create longer roots. Earlier assigned regular forms remain intact
+when later meanings require extensions during the same run. Regenerating with a
+different input order can still change assignments.
