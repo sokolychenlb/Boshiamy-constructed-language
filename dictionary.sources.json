@@ -1,0 +1,89 @@
+{
+  "entries": [
+    {
+      "character": "蝦",
+      "meaning": "shrimp; prawn; lobster (Classifier: 隻／只 m c mn; 尾 m mn)",
+      "pos": "noun",
+      "pos_basis": "sense noun-classifier category",
+      "codes_url": "https://boshiamy.then.tw/query/%E8%9D%A6",
+      "dictionary_url": "https://kaikki.org/dictionary/Chinese/meaning/%E8%9D%A6/%E8%9D%A6/%E8%9D%A6.html",
+      "wiktionary_url": "https://en.wiktionary.org/wiki/%E8%9D%A6"
+    },
+    {
+      "character": "米",
+      "meaning": "hulled or husked uncooked rice (Classifier: 粒 m c mn; 顆／颗 m)",
+      "pos": "noun",
+      "pos_basis": "sense noun-classifier category",
+      "codes_url": "https://boshiamy.then.tw/query/%E7%B1%B3",
+      "dictionary_url": "https://kaikki.org/dictionary/Chinese/meaning/%E7%B1%B3/%E7%B1%B3/%E7%B1%B3.html",
+      "wiktionary_url": "https://en.wiktionary.org/wiki/%E7%B1%B3"
+    },
+    {
+      "character": "人",
+      "meaning": "man; person; people (Classifier: 個／个 m c; 隻／只 h)",
+      "pos": "noun",
+      "pos_basis": "sense noun-classifier category",
+      "codes_url": "https://boshiamy.then.tw/query/%E4%BA%BA",
+      "dictionary_url": "https://kaikki.org/dictionary/Chinese/meaning/%E4%BA%BA/%E4%BA%BA/%E4%BA%BA.html",
+      "wiktionary_url": "https://en.wiktionary.org/wiki/%E4%BA%BA"
+    },
+    {
+      "character": "山",
+      "meaning": "mountain; hill (Classifier: 座 m c; 粒 mn)",
+      "pos": "noun",
+      "pos_basis": "sense noun-classifier category",
+      "codes_url": "https://boshiamy.then.tw/query/%E5%B1%B1",
+      "dictionary_url": "https://kaikki.org/dictionary/Chinese/meaning/%E5%B1%B1/%E5%B1%B1/%E5%B1%B1.html",
+      "wiktionary_url": "https://en.wiktionary.org/wiki/%E5%B1%B1"
+    },
+    {
+      "character": "水",
+      "meaning": "water (Classifier: 瓶 m; 樽 c; 滴 m c; 池 m c; 盆 m c; 杯 m c)",
+      "pos": "noun",
+      "pos_basis": "sense noun-classifier category",
+      "codes_url": "https://boshiamy.then.tw/query/%E6%B0%B4",
+      "dictionary_url": "https://kaikki.org/dictionary/Chinese/meaning/%E6%B0%B4/%E6%B0%B4/%E6%B0%B4.html",
+      "wiktionary_url": "https://en.wiktionary.org/wiki/%E6%B0%B4"
+    },
+    {
+      "character": "火",
+      "meaning": "fire; flame (Classifier: 把 m; 團／团 m)",
+      "pos": "noun",
+      "pos_basis": "sense noun-classifier category",
+      "codes_url": "https://boshiamy.then.tw/query/%E7%81%AB",
+      "dictionary_url": "https://kaikki.org/dictionary/Chinese/meaning/%E7%81%AB/%E7%81%AB/%E7%81%AB.html",
+      "wiktionary_url": "https://en.wiktionary.org/wiki/%E7%81%AB"
+    },
+    {
+      "character": "木",
+      "meaning": "tree; woody plant",
+      "pos": "noun",
+      "pos_basis": "heuristic: unlabelled gloss defaults to noun; review required",
+      "codes_url": "https://boshiamy.then.tw/query/%E6%9C%A8",
+      "dictionary_url": "https://kaikki.org/dictionary/Chinese/meaning/%E6%9C%A8/%E6%9C%A8/%E6%9C%A8.html",
+      "wiktionary_url": "https://en.wiktionary.org/wiki/%E6%9C%A8"
+    },
+    {
+      "character": "日",
+      "meaning": "Sun",
+      "pos": "noun",
+      "pos_basis": "heuristic: unlabelled gloss defaults to noun; review required",
+      "codes_url": "https://boshiamy.then.tw/query/%E6%97%A5",
+      "dictionary_url": "https://kaikki.org/dictionary/Chinese/meaning/%E6%97%A5/%E6%97%A5/%E6%97%A5.html",
+      "wiktionary_url": "https://en.wiktionary.org/wiki/%E6%97%A5"
+    },
+    {
+      "character": "月",
+      "meaning": "moon (Classifier: 輪／轮 m)",
+      "pos": "noun",
+      "pos_basis": "sense noun-classifier category",
+      "codes_url": "https://boshiamy.then.tw/query/%E6%9C%88",
+      "dictionary_url": "https://kaikki.org/dictionary/Chinese/meaning/%E6%9C%88/%E6%9C%88/%E6%9C%88.html",
+      "wiktionary_url": "https://en.wiktionary.org/wiki/%E6%9C%88"
+    }
+  ],
+  "failures": [],
+  "attribution": "Definitions adapted from English Wiktionary via Kaikki.org / Wiktextract.",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "license_note": "Retain attribution and applicable share-alike terms when redistributing definitions."
+}

@@ -1,0 +1,44 @@
+{
+  "entries": [
+    {
+      "character": "蝦",
+      "meaning": "shrimp; prawn; lobster (Classifier: 隻／只 m c mn; 尾 m mn)",
+      "pos": "noun",
+      "detailed_pos": "noun",
+      "pos_basis": "dictionary sense category: Chinese nouns classified by 尾",
+      "pos_confidence": "high",
+      "pos_review_required": false,
+      "codes_url": "https://boshiamy.then.tw/query/%E8%9D%A6",
+      "dictionary_url": "https://kaikki.org/dictionary/Chinese/meaning/%E8%9D%A6/%E8%9D%A6/%E8%9D%A6.html",
+      "wiktionary_url": "https://en.wiktionary.org/wiki/%E8%9D%A6"
+    },
+    {
+      "character": "米",
+      "meaning": "hulled or husked uncooked rice (Classifier: 粒 m c mn; 顆／颗 m)",
+      "pos": "noun",
+      "detailed_pos": "noun",
+      "pos_basis": "dictionary sense category: Chinese nouns classified by 粒",
+      "pos_confidence": "high",
+      "pos_review_required": false,
+      "codes_url": "https://boshiamy.then.tw/query/%E7%B1%B3",
+      "dictionary_url": "https://kaikki.org/dictionary/Chinese/meaning/%E7%B1%B3/%E7%B1%B3/%E7%B1%B3.html",
+      "wiktionary_url": "https://en.wiktionary.org/wiki/%E7%B1%B3"
+    }
+  ],
+  "failures": [],
+  "pos_resource": "https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip",
+  "pos_resource_license": "https://wordnet.princeton.edu/license-and-commercial-use",
+  "attribution": "Definitions adapted from English Wiktionary via Kaikki.org / Wiktextract.",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "license_note": "Retain attribution and applicable share-alike terms when redistributing definitions.",
+  "sense_policy": "first usable sense per character",
+  "generation_failures": [],
+  "pos_summary": {
+    "noun": 2
+  },
+  "pos_review_entries": 0,
+  "pos_unresolved_entries": 0,
+  "generated_entries": 2,
+  "generated_characters": 2,
+  "complete": true
+}
